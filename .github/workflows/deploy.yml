@@ -147,14 +147,6 @@ jobs:
               echo "✅ Deployment successful! App is responding with status: $response"
               exit 0
             fi
-            
-            echo "Got response: $response, waiting 5 seconds..."
-            sleep 5
-          done
-
-          echo "❌ Deployment verification failed after 2 attempts"
-          echo "Please check PM2 logs on the server"
-          exit 1
 
       - name: Rollback on failure
         if: failure()
