@@ -117,13 +117,23 @@ jobs:
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
+          # ---- DEBUG INFO ----
+          echo "EC2_HOST length: ${#EC2_HOST}"
+          echo "EC2_HOST first char: '${EC2_HOST:0:1}'"
+          echo "EC2_HOST last char: '${EC2_HOST: -1}'"
+          echo "Connecting to: http://${EC2_HOST}:8000"
+          echo "---- Verbose curl ----"
+          curl -v --connect-timeout 10 "http://${EC2_HOST}:8000" 2>&1 || true
+          echo "---- End verbose curl ----"
+          # ---- END DEBUG ----
+
           echo "Waiting for application to start..."
           sleep 10
 
           for i in {1..5}; do
             echo "Attempt $i of 5..."
 
-            response=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 http://${EC2_HOST}:8000 2>/dev/null) || response="000"
+            response=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 15 "http://${EC2_HOST}:8000" 2>/dev/null) || response="000"
 
             if [ "$response" = "200" ] || [ "$response" = "301" ] || [ "$response" = "302" ]; then
               echo "✅ Deployment successful! App is responding with status: $response"
